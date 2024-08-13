@@ -14,4 +14,19 @@ SELECT Application_Status, COUNT(*) AS status_count
 FROM `patent.patents`
 GROUP BY Application_Status
 ORDER BY status_count DESC
+/*Distribution Analysis*/
+/*Distribution by Priority Country*/
+SELECT PriorityCountry, COUNT(*) AS country_count
+FROM `patent.patents`
+where PriorityCountry is not null
+GROUP BY PriorityCountry
+ORDER BY country_count DESC
+/*Distribution of Publication Dates*/
+SELECT extract(month from PublicationDate) AS publication_month, COUNT(*) AS publication_count
+FROM `patent.patents`
+GROUP BY publication_month
+ORDER BY publication_month
+
+
+
 
