@@ -1,7 +1,6 @@
 /*Advanced analysis*/
 /*count of patent with priority claims*/
 SELECT 
-    COUNT(*) AS Total_Patents_With_Priority,
     COUNT(DISTINCT PriorityNumber) AS Unique_Priority_Numbers
 FROM 
     `patent.patents`
@@ -57,26 +56,31 @@ ORDER BY
 /*Average time from application to grant*/
 SELECT 
     Status, 
-    AVG(DATE_DIFF(DateOfCertificateIssue, ApplicationFilingDate, DAY)) AS Avg_Days_To_Grant
+    AVG(DATE_DIFF(DateOfCertificateIssue, ApplicationFilingDate, DAY)) AS Avg_Days_To_Grant,
+    MIN(DATE_DIFF(DateOfCertificateIssue, ApplicationFilingDate, DAY)) AS Min_Days,
+    MAX(DATE_DIFF(DateOfCertificateIssue, ApplicationFilingDate, DAY)) AS Max_Days
 FROM 
     `patent.patents`
 WHERE 
     DateOfCertificateIssue IS NOT NULL
+    AND ApplicationFilingDate IS NOT NULL
 GROUP BY 
-    Status
-ORDER BY 
-    Avg_Days_To_Grant ASC
+    Status;
 /*Time from Filing to Publication*/
 SELECT 
-    ApplicationNumber,
-    DATE_DIFF(PublicationDate, ApplicationFilingDate, DAY) AS Days_From_Filing_To_Publication
+    Status, 
+    AVG(DATE_DIFF(PublicationDate, ApplicationFilingDate, DAY)) AS Avg_Days_To_Publication,
+    COUNT(*) AS Total_Applications
 FROM 
     `patent.patents`
 WHERE 
-    PublicationDate IS NOT NULL 
+    PublicationDate IS NOT NULL
     AND ApplicationFilingDate IS NOT NULL
+GROUP BY 
+    Status
 ORDER BY 
-    Days_From_Filing_To_Publication ASC;
+    Avg_Days_To_Publication ASC;
+
 
 
 
