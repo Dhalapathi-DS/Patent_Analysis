@@ -1,7 +1,8 @@
 /*Exploratory Data Analysis (EDA)*/
 /*Summary Statistics: Use SQL to calculate basic statistics (e.g., COUNT, AVG, MIN, MAX) for various fields*/
 /*Count of Patents*/
-SELECT COUNT(*) AS total_patents FROM patents;
+SELECT COUNT(DISTINCT ApplicationNumber) AS total_patents
+FROM `patent.patents`
 /*Average Time Between Application and Publication*/
 SELECT AVG(DATE_DIFF(PublicationDate, ApplicationFilingDate, DAY)) AS avg_time_to_publication
 FROM `patent.patents`
@@ -10,10 +11,18 @@ SELECT MIN(ApplicationDate) AS earliest_application,
        MAX(ApplicationDate) AS latest_application
 FROM `patent.patents`
 /*Distribution of Application Status*/
-SELECT Application_Status, COUNT(*) AS status_count
+SELECT 
+    CASE 
+        WHEN LOWER(application_status) LIKE '%granted%' THEN 'Granted'
+        WHEN LOWER(application_status) LIKE '%abandoned%' THEN 'Abandoned'
+        WHEN LOWER(application_status) LIKE '%application%' THEN 'Application'
+        WHEN LOWER(application_status) LIKE '%withdrawn%' THEN 'Withdrawn'
+        WHEN LOWER(application_status) LIKE '%reduced%' THEN 'Reduced'
+        ELSE 'Other'
+    END AS status_category,
+    COUNT(*) AS total_count
 FROM `patent.patents`
-GROUP BY Application_Status
-ORDER BY status_count DESC
+GROUP BY status_category;
 /*Distribution Analysis*/
 /*Distribution by Priority Country*/
 SELECT PriorityCountry, COUNT(*) AS country_count
