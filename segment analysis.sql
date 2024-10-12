@@ -10,22 +10,41 @@ ORDER BY
     Total_Patents DESC;
 /*Patents by Inventor Country*/
 SELECT 
-    InventorCountry, 
-    COUNT(*) AS Total_Patents
-FROM 
-    `patent.patents`
+    TRIM(country) AS country, 
+    COUNT(*) AS total_patents
+FROM (
+    SELECT 
+        TRIM(country) AS country
+    FROM 
+        `patent.patents`,
+        UNNEST(SPLIT(REPLACE(ApplicantCountry, '#', ','), ',')) AS country
+)
+WHERE 
+    country IS NOT NULL AND country != ''  -- Exclude NULL and empty string values
 GROUP BY 
-    InventorCountry
+    country
 ORDER BY 
-    Total_Patents DESC;
+    total_patents DESC;
+
 /*Segment Analysis by Classification (IPC)*/
 SELECT 
-    Classification_IPC, 
-    COUNT(*) AS Total_Patents
+    CASE 
+        WHEN Classification_IPC LIKE 'A%' THEN 'A — Human Necessities'
+        WHEN Classification_IPC LIKE 'B%' THEN 'B — Performing Operations; Transporting'
+        WHEN Classification_IPC LIKE 'C%' THEN 'C — Chemistry; Metallurgy'
+        WHEN Classification_IPC LIKE 'D%' THEN 'D — Textiles; Paper'
+        WHEN Classification_IPC LIKE 'E%' THEN 'E — Fixed Constructions'
+        WHEN Classification_IPC LIKE 'F%' THEN 'F — Mechanical Engineering; Lighting; Heating; Weapons; Blasting'
+        WHEN Classification_IPC LIKE 'G%' THEN 'G — Physics'
+        WHEN Classification_IPC LIKE 'H%' THEN 'H — Electricity'
+        ELSE 'Others' 
+    END AS IPC_Category,
+    COUNT(*) AS Count
 FROM 
-    `patent.patents`
+    `patent.patents` -- Replace with your actual table name
 GROUP BY 
-    Classification_IPC
+    IPC_Category
 ORDER BY 
-    Total_Patents DESC;
+    IPC_Category;
+
 
